@@ -1,4 +1,4 @@
-package com.example.whatdidyoudo.ui.main
+package com.example.whatdidyoudo.databases
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

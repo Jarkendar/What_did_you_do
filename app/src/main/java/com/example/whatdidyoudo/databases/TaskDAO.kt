@@ -1,4 +1,4 @@
-package com.example.whatdidyoudo.ui.main
+package com.example.whatdidyoudo.databases
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whatdidyoudo.R
+import com.example.whatdidyoudo.databases.Task
 
 class RowAdapter(private var dataList: ArrayList<Task>): RecyclerView.Adapter<RowAdapter.ViewHolder>() {
 
