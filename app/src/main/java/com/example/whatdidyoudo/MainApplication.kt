@@ -3,6 +3,7 @@ package com.example.whatdidyoudo
 import android.app.Application
 import com.example.whatdidyoudo.di.repositoryModule
 import com.example.whatdidyoudo.di.appDatabase
+import com.example.whatdidyoudo.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidFileProperties
 import org.koin.android.ext.koin.androidLogger
@@ -17,7 +18,7 @@ class MainApplication: Application() {
             androidLogger()
             androidContext(this@MainApplication)
             androidFileProperties()
-            modules(repositoryModule, appDatabase)
+            modules(appModule, repositoryModule, appDatabase)
         }
     }
 }

@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whatdidyoudo.R
 import com.example.whatdidyoudo.databinding.MainFragmentBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainFragment : Fragment() {
 
@@ -18,7 +18,7 @@ class MainFragment : Fragment() {
     }
 
     private var recyclerView: RecyclerView? = null
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +29,8 @@ class MainFragment : Fragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         recyclerView = this.view?.findViewById(R.id.recycler_view)
         recyclerView?.adapter = RowAdapter(viewModel.taskList)
         val binding: MainFragmentBinding = DataBindingUtil.setContentView(this.requireActivity(), R.layout.main_fragment)
