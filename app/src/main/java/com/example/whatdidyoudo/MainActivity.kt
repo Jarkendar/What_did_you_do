@@ -2,7 +2,7 @@ package com.example.whatdidyoudo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.whatdidyoudo.ui.main.MainFragment
+import com.example.whatdidyoudo.ui.main.TaskFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+                .replace(R.id.container, TaskFragment.newInstance())
                 .commitNow()
         }
     }

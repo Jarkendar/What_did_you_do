@@ -1,7 +1,7 @@
 package com.example.whatdidyoudo.di
 
 import com.example.whatdidyoudo.databases.Repository
-import com.example.whatdidyoudo.ui.main.MainViewModel
+import com.example.whatdidyoudo.ui.main.TaskFragmentViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -10,5 +10,5 @@ val repositoryModule = module {
 }
 
 val appModule = module {
-    viewModel { MainViewModel(get()) }
+    viewModel { TaskFragmentViewModel(get()) }
 }
