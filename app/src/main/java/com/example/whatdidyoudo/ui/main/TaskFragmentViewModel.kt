@@ -8,6 +8,7 @@ import com.example.whatdidyoudo.databases.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -27,6 +28,12 @@ class TaskFragmentViewModel(repository: Repository) : ViewModel() {
         }
         viewModelScope.launch {
             taskLiveData.value = taskList
+        }
+
+        viewModelScope.launch {
+            repository.getTaskFlow().collect { list ->
+                taskLiveData.value = ArrayList(list)
+            }
         }
 
         viewModelScope.launch {
