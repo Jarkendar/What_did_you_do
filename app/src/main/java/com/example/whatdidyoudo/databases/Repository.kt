@@ -1,12 +1,12 @@
 package com.example.whatdidyoudo.databases
 
-import android.util.Log
+import android.icu.util.Calendar
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import java.util.*
 
 class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
 
@@ -16,24 +16,38 @@ class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
 
     private val appDatabase: AppDatabase = get()
 
-    private val taskFlow: Flow<List<Task>> = flow {
-        while (true) {
-            val taskList = getAllTasks()
-            Log.d("****dupa", "$taskList")
-            emit(taskList)
-            kotlinx.coroutines.delay(TASK_LIST_REFRESH_TIME)
-        }
-    }
-
-    fun getTaskFlow(): Flow<List<Task>> {
-        return taskFlow.flowOn(ioDispatcher)
+    fun getTaskFlowFromDate(date: Date): Flow<List<Task>> {
+        return flow {
+            while (true) {
+                val taskList = getTaskFromDate(date).sortedByDescending { it.timestamp }
+                emit(taskList)
+                kotlinx.coroutines.delay(TASK_LIST_REFRESH_TIME)
+            }
+        }.flowOn(ioDispatcher)
     }
 
     fun insertTask(task: Task) {
         appDatabase.taskDao().insertTask(task)
     }
 
-    fun getAllTasks(): List<Task> {
-        return appDatabase.taskDao().getAll()
+    fun updateTask(task: Task) {
+        appDatabase.taskDao().updateTask(task)
     }
+
+    private fun getTaskFromDate(date: Date): List<Task> {
+        val startDate = getStartDateMillis(date)
+        val endDate = getEndDateMillis(date)
+        return appDatabase.taskDao().getAllTaskInDay(startDate, endDate)
+    }
+
+
+    private fun getStartDateMillis(date: Date) = Calendar.getInstance().apply {
+        time = date
+        set(Calendar.MILLISECONDS_IN_DAY, 0)
+    }.timeInMillis
+
+    private fun getEndDateMillis(date: Date) = Calendar.getInstance().apply {
+        time = date
+        set(Calendar.MILLISECONDS_IN_DAY, 24 * 60 * 60 * 1000 - 1)
+    }.timeInMillis
 }

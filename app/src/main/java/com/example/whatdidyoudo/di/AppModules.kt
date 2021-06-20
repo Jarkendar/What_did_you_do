@@ -11,5 +11,5 @@ val repositoryModule = module {
 }
 
 val appModule = module {
-    viewModel { TaskFragmentViewModel(get()) }
+    viewModel { TaskFragmentViewModel(Dispatchers.IO, get()) }
 }

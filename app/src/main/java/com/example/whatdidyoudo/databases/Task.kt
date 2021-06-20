@@ -6,8 +6,7 @@ import java.util.*
 
 @Entity
 data class Task(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = false) val timestamp: Date,
     val text: String,
-    val timestamp: Date,
-    val isProductive: Boolean
+    var isProductive: Boolean = false
 )

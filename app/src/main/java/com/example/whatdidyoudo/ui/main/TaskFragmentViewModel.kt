@@ -1,48 +1,69 @@
 package com.example.whatdidyoudo.ui.main
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.whatdidyoudo.databases.Repository
 import com.example.whatdidyoudo.databases.Task
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
-class TaskFragmentViewModel(repository: Repository) : ViewModel() {
+class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repository: Repository) :
+    ViewModel() {
 
-    val taskLiveData: MutableLiveData<ArrayList<Task>> = MutableLiveData()
-    val taskList = ArrayList<Task>()
+    companion object {
+        private val simpleDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    }
 
-    val dupaString = MutableLiveData<String>("dupa")
+    val currentDateString: MutableLiveData<String> =
+        MutableLiveData(simpleDateFormat.format(Date()))
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
+    private val selectedDate: MutableStateFlow<Date> = MutableStateFlow(Date())
 
-    init {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val liveData: LiveData<List<Task>> = selectedDate.flatMapLatest { value ->
+        repository.getTaskFlowFromDate(value)
+    }.asLiveData(ioDispatcher)
+
+    private val coroutineScope = CoroutineScope(ioDispatcher + Job())
+
+    fun addTask(task: Task) {
         coroutineScope.launch {
-            taskList.addAll(repository.getAllTasks())
+            repository.insertTask(task)
         }
-        viewModelScope.launch {
-            taskLiveData.value = taskList
-        }
+    }
 
-        viewModelScope.launch {
-            repository.getTaskFlow().collect { list ->
-                taskLiveData.value = ArrayList(list)
-            }
+    fun updateTask(task: Task) {
+        coroutineScope.launch {
+            repository.updateTask(task)
         }
+    }
 
+    fun changeDate(newDate: Date) {
         viewModelScope.launch {
-            taskList.add(Task(5, "dupa", Date(), false))
-            taskList.add(Task(1, "dupa", Date(), true))
-            taskList.add(Task(2, "dupa", Date(), false))
-            taskList.add(Task(3, "dupa", Date(), true))
-            taskList.add(Task(4, "dupa", Date(), false))
-            taskLiveData.value = taskList
+            currentDateString.value = simpleDateFormat.format(newDate)
+            selectedDate.value = newDate
         }
+    }
+
+    fun getSelectedYear(): Int {
+        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.YEAR)
+    }
+
+    fun getSelectedMonth(): Int {
+        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.MONTH)
+    }
+
+    fun getSelectedDayOfMonth(): Int {
+        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.DAY_OF_MONTH)
     }
 }

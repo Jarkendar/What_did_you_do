@@ -3,6 +3,7 @@ package com.example.whatdidyoudo.databases
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 
@@ -15,7 +16,7 @@ interface TaskDAO {
     @Query("SELECT * FROM task WHERE task.timestamp BETWEEN :startTime AND :endTime")
     fun getAllTaskInDay(startTime: Long, endTime: Long): List<Task>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTask(task: Task)
 
     @Update
