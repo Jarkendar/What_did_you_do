@@ -3,6 +3,8 @@ package com.example.whatdidyoudo.ui.main
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -34,6 +36,7 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
         binding.viewModel = this.viewModel
         binding.lifecycleOwner = this
 
+        setHasOptionsMenu(true)
         val rootView = binding.root
 
         initializeRecyclerView(rootView)
@@ -48,6 +51,11 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
             showDatePickerDialog()
         }
         return rootView
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.task_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun initializeRecyclerView(view: View) {
