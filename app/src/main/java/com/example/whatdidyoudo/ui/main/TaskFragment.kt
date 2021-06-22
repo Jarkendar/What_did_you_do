@@ -18,7 +18,6 @@ import com.google.android.material.textfield.TextInputLayout
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
-
 class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
     private val viewModel: TaskFragmentViewModel by viewModel()
@@ -32,12 +31,26 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
         savedInstanceState: Bundle?
     ): View {
         val binding: FragmentItemListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_item_list, container, false)
-
         binding.viewModel = this.viewModel
         binding.lifecycleOwner = this
 
-        val view = binding.root
+        val rootView = binding.root
 
+        initializeRecyclerView(rootView)
+
+        viewModel.liveData.observe(viewLifecycleOwner, {
+            recyclerAdapter.updateData(it.toList())
+        })
+
+        setEndIconListener(rootView)
+
+        rootView.findViewById<Button>(R.id.button).setOnClickListener {
+            showDatePickerDialog()
+        }
+        return rootView
+    }
+
+    private fun initializeRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.list)
         recyclerAdapter =
             TaskRecyclerViewAdapter(this, viewModel.liveData.value?.toMutableList() ?: emptyList())
@@ -46,13 +59,27 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
             layoutManager = recyclerManager
             adapter = recyclerAdapter
         }
+    }
 
-        viewModel.liveData.observe(viewLifecycleOwner, {
-            recyclerAdapter.updateData(it.toList())
-        })
+    private fun showDatePickerDialog() {
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                viewModel.changeDate(Calendar.getInstance().apply {
+                    set(Calendar.YEAR, year)
+                    set(Calendar.MONTH, month)
+                    set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                }.time)
+            },
+            viewModel.getSelectedYear(),
+            viewModel.getSelectedMonth(),
+            viewModel.getSelectedDayOfMonth()
+        ).show()
+    }
 
-        val textInputLayout = view.findViewById<TextInputLayout>(R.id.text_input_layout)
-        val textInputEditText = view.findViewById<TextInputEditText>(R.id.text_input_edit_text)
+    private fun setEndIconListener(rootView: View) {
+        val textInputLayout = rootView.findViewById<TextInputLayout>(R.id.text_input_layout)
+        val textInputEditText = rootView.findViewById<TextInputEditText>(R.id.text_input_edit_text)
         textInputLayout.setEndIconOnClickListener {
             textInputEditText.text?.let {
                 if (it.isNotBlank()) {
@@ -61,24 +88,8 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
                 }
             }
         }
-
-        view.findViewById<Button>(R.id.button).setOnClickListener {
-            DatePickerDialog(requireContext(),
-                { _, year, month, dayOfMonth ->
-                    viewModel.changeDate(Calendar.getInstance().apply {
-                        set(Calendar.YEAR, year)
-                        set(Calendar.MONTH, month)
-                        set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                    }.time)
-                },
-                viewModel.getSelectedYear(),
-                viewModel.getSelectedMonth(),
-                viewModel.getSelectedDayOfMonth()
-            )
-                .show()
-        }
-        return view
     }
+
 
     override fun onChangeProductivity(task: Task) {
         viewModel.updateTask(task)
