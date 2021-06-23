@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,14 +46,18 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
         setEndIconListener(rootView)
 
-        rootView.findViewById<Button>(R.id.button).setOnClickListener {
-            showDatePickerDialog()
-        }
         return rootView
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.task_menu, menu)
+        viewModel.currentDateString.observe(viewLifecycleOwner) {
+            menu.findItem(R.id.date_string).title = it
+        }
+        menu.findItem(R.id.date_button).setOnMenuItemClickListener {
+            showDatePickerDialog()
+            true
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 

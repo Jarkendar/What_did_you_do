@@ -6,16 +6,16 @@
         android:id="@+id/date_string"
         android:enabled="false"
         android:orderInCategory="100"
-        android:title="Date"
+        android:title="@string/default_date_format"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="always|withText" />
 
     <item
-        android:id="@+id/date"
+        android:id="@+id/date_button"
         android:enabled="true"
         android:icon="@drawable/calendar_month"
         android:orderInCategory="150"
-        android:title="Date"
+        android:title="@string/default_date_format"
         android:visible="true"
         app:showAsAction="always|withText" />
 </menu>

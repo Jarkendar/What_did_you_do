@@ -55,6 +55,20 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
         }
     }
 
+    fun setNextDay() {
+        changeDate(Calendar.getInstance().apply {
+            time = selectedDate.value
+            add(Calendar.DAY_OF_MONTH, 1)
+        }.time)
+    }
+
+    fun setPreviousDay() {
+        changeDate(Calendar.getInstance().apply {
+            time = selectedDate.value
+            add(Calendar.DAY_OF_MONTH, -1)
+        }.time)
+    }
+
     fun getSelectedYear(): Int {
         return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.YEAR)
     }
