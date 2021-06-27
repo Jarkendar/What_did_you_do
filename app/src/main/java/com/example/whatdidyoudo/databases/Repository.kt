@@ -1,6 +1,7 @@
 package com.example.whatdidyoudo.databases
 
-import android.icu.util.Calendar
+import com.example.whatdidyoudo.utils.getEndDateMillis
+import com.example.whatdidyoudo.utils.getStartDateMillis
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -39,19 +40,8 @@ class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
     }
 
     private fun getTaskFromDate(date: Date): List<Task> {
-        val startDate = getStartDateMillis(date)
-        val endDate = getEndDateMillis(date)
+        val startDate = getStartDateMillis(date).time
+        val endDate = getEndDateMillis(date).time
         return appDatabase.taskDao().getAllTaskInDay(startDate, endDate)
     }
-
-
-    private fun getStartDateMillis(date: Date) = Calendar.getInstance().apply {
-        time = date
-        set(Calendar.MILLISECONDS_IN_DAY, 0)
-    }.timeInMillis
-
-    private fun getEndDateMillis(date: Date) = Calendar.getInstance().apply {
-        time = date
-        set(Calendar.MILLISECONDS_IN_DAY, 24 * 60 * 60 * 1000 - 1)
-    }.timeInMillis
 }

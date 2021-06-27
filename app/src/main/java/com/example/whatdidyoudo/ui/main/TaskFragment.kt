@@ -21,6 +21,10 @@ import java.util.*
 
 class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
+    companion object {
+        fun newInstance() = TaskFragment()
+    }
+
     private val viewModel: TaskFragmentViewModel by viewModel()
 
     private lateinit var recyclerView: RecyclerView
@@ -104,12 +108,7 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
         }
     }
 
-
     override fun onChangeProductivity(task: Task) {
         viewModel.updateTask(task)
-    }
-
-    companion object {
-        fun newInstance() = TaskFragment()
     }
 }
