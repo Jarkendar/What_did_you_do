@@ -85,7 +85,10 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
             viewModel.getSelectedYear(),
             viewModel.getSelectedMonth(),
             viewModel.getSelectedDayOfMonth()
-        ).show()
+        ).apply {
+            datePicker.minDate = viewModel.minimalDate.time
+            datePicker.maxDate = System.currentTimeMillis()
+        }.show()
     }
 
     private fun setEndIconListener(rootView: View) {

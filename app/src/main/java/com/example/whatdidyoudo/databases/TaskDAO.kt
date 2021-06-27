@@ -24,4 +24,7 @@ interface TaskDAO {
 
     @Delete
     fun deleteTask(task: Task)
+
+    @Query("SELECT MIN(task.timestamp) FROM task")
+    fun getMinimalDateOfTasks(): Long
 }

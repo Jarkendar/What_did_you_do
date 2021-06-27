@@ -4,7 +4,6 @@ import android.icu.util.Calendar
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import java.util.*
@@ -33,6 +32,10 @@ class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
 
     fun updateTask(task: Task) {
         appDatabase.taskDao().updateTask(task)
+    }
+
+    fun getMinDateOfTask(): Date {
+        return Date(appDatabase.taskDao().getMinimalDateOfTasks())
     }
 
     private fun getTaskFromDate(date: Date): List<Task> {
