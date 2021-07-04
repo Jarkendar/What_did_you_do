@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.whatdidyoudo.R
 import com.example.whatdidyoudo.databases.Task
 import com.example.whatdidyoudo.databinding.FragmentItemBinding
 import java.text.SimpleDateFormat
@@ -25,6 +27,7 @@ class TaskRecyclerViewAdapter(
     inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val content: TextView = binding.content
         val timestamp: TextView = binding.timestamp
+        val statusImage: ImageView = binding.statusImage
         val status: CheckBox = binding.status
         val divider: View = binding.divider
     }
@@ -44,8 +47,10 @@ class TaskRecyclerViewAdapter(
         holder.content.text = item.text
         holder.timestamp.text = dateFormatter.format(item.timestamp)
         holder.status.isChecked = item.isProductive
+        holder.statusImage.setImageResource(chooseImageResource(item.isProductive))
         holder.status.setOnCheckedChangeListener { _, isChecked ->
             onTaskClickListener.onChangeProductivity(item.apply { isProductive = isChecked })
+            holder.statusImage.setImageResource(chooseImageResource(isChecked))
         }
         holder.divider.visibility = if (position == values.size - 1) {
             View.GONE
@@ -60,5 +65,8 @@ class TaskRecyclerViewAdapter(
         values = newDataList
         notifyDataSetChanged()
     }
+
+    private fun chooseImageResource(isChecked: Boolean) =
+        if (isChecked) R.drawable.hard_work_hat else R.drawable.coffee
 
 }

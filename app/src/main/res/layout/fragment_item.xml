@@ -25,7 +25,16 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/status" />
+        app:layout_constraintEnd_toStartOf="@id/status_image" />
+
+    <ImageView
+        android:id="@+id/status_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/status"
+        app:layout_constraintEnd_toStartOf="@id/status"
+        app:layout_constraintTop_toTopOf="@id/status"
+        app:srcCompat="@drawable/coffee" />
 
     <CheckBox
         android:id="@+id/status"
