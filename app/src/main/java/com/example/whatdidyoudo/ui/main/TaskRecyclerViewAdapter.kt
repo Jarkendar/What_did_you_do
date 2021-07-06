@@ -15,7 +15,7 @@ import java.util.*
 
 class TaskRecyclerViewAdapter(
     private val onTaskClickListener: OnTaskClickListener,
-    private var values: List<Task>
+    private var taskList: List<Task>
 ) : RecyclerView.Adapter<TaskRecyclerViewAdapter.ViewHolder>() {
 
     interface OnTaskClickListener {
@@ -43,27 +43,34 @@ class TaskRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
+        val item = taskList[position]
         holder.content.text = item.text
         holder.timestamp.text = dateFormatter.format(item.timestamp)
-        holder.status.isChecked = item.isProductive
         holder.statusImage.setImageResource(chooseImageResource(item.isProductive))
+        holder.status.setOnCheckedChangeListener(null)
+        holder.status.isChecked = item.isProductive
         holder.status.setOnCheckedChangeListener { _, isChecked ->
             onTaskClickListener.onChangeProductivity(item.apply { isProductive = isChecked })
-            holder.statusImage.setImageResource(chooseImageResource(isChecked))
         }
-        holder.divider.visibility = if (position == values.size - 1) {
+        holder.divider.visibility = if (position == taskList.size - 1) {
             View.GONE
         } else {
             View.VISIBLE
         }
     }
 
-    override fun getItemCount(): Int = values.size
+    override fun getItemCount(): Int = taskList.size
 
-    fun updateData(newDataList: List<Task>) {
-        values = newDataList
-        notifyDataSetChanged()
+    fun updateData(newTaskList: List<Task>) {
+        val added = (taskList.size until newTaskList.size)
+        val changed =
+            taskList.mapIndexedNotNull { index, task -> if (newTaskList.size > index && task != newTaskList[index]) index else null }
+        val removed = (newTaskList.size until taskList.size).reversed()
+
+        added.forEach { notifyItemInserted(it) }
+        changed.forEach { notifyItemChanged(it) }
+        removed.forEach { notifyItemRemoved(it) }
+        taskList = newTaskList
     }
 
     private fun chooseImageResource(isChecked: Boolean) =
