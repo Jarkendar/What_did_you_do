@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_list">
+
+    <fragment
+        android:id="@+id/navigation_list"
+        android:name="com.example.whatdidyoudo.ui.main.TaskFragment"
+        android:label="@string/title_list"
+        tools:layout="@layout/fragment_item_list">
+        <action
+            android:id="@+id/action_navigation_list_to_navigation_statistics"
+            app:destination="@id/navigation_statistics" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_statistics"
+        android:name="com.example.whatdidyoudo.ui.statistics.StatisticsFragment"
+        android:label="@string/title_statistic"
+        tools:layout="@layout/fragment_statistics">
+        <action
+            android:id="@+id/action_navigation_statistics_to_navigation_list"
+            app:destination="@id/navigation_list" />
+    </fragment>
+</navigation>

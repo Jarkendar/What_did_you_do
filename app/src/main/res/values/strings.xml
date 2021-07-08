@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">What did you do</string>
 
+    <string name="title_list">Actions list</string>
+    <string name="title_statistic">Statistics</string>
+
     <string name="default_date_format">dd-MM-yyyy</string>
 
     <string name="previous_day_arrow">Previous day arrow</string>
     <string name="next_day_arrow">Next day arrow</string>
+    <string name="title_activity_bottom_navigation">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
