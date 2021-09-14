@@ -21,10 +21,6 @@ import java.util.*
 
 class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
-    companion object {
-        fun newInstance() = TaskFragment()
-    }
-
     private val viewModel: TaskFragmentViewModel by viewModel()
 
     private lateinit var recyclerView: RecyclerView
@@ -44,7 +40,7 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
         initializeRecyclerView(rootView)
 
-        viewModel.liveData.observe(viewLifecycleOwner, {
+        viewModel.liveTaskList.observe(viewLifecycleOwner, {
             recyclerAdapter.updateData(it.toList())
         })
 
@@ -68,7 +64,10 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
     private fun initializeRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.list)
         recyclerAdapter =
-            TaskRecyclerViewAdapter(this, viewModel.liveData.value?.toMutableList() ?: emptyList())
+            TaskRecyclerViewAdapter(
+                this,
+                viewModel.liveTaskList.value?.toMutableList() ?: emptyList()
+            )
         recyclerManager = LinearLayoutManager(context)
         with(recyclerView) {
             layoutManager = recyclerManager
