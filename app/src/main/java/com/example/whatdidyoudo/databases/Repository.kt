@@ -12,19 +12,12 @@ import java.util.*
 
 class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
 
-    companion object {
-        private const val TASK_LIST_REFRESH_TIME = 1000L        // 1s
-    }
-
     private val appDatabase: AppDatabase = get()
 
     fun getTaskFlowFromDate(date: Date): Flow<List<Task>> {
         return flow {
-            while (true) {
-                val taskList = getTaskFromDate(date).sortedByDescending { it.timestamp }
-                emit(taskList)
-                kotlinx.coroutines.delay(TASK_LIST_REFRESH_TIME)
-            }
+            val taskList = getTaskFromDate(date).sortedByDescending { it.timestamp }
+            emit(taskList)
         }.flowOn(ioDispatcher)
     }
 

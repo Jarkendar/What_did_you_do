@@ -22,6 +22,16 @@ import java.util.*
 class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repository: Repository) :
     ViewModel() {
 
+    data class TaskListState(val date: Date) {
+        override fun equals(other: Any?): Boolean {
+            return false
+        }
+
+        override fun hashCode(): Int {
+            return date.hashCode()
+        }
+    }
+
     companion object {
         private const val DEFAULT_START_MILLIS = 0L
         private const val OPAQUE = 1.0f
@@ -39,11 +49,12 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
     var minimalDate: Date = Date(DEFAULT_START_MILLIS)
 
     private val coroutineScope = CoroutineScope(ioDispatcher + Job())
-    private val selectedDate: MutableStateFlow<Date> = MutableStateFlow(Date())
+    private val selectedDate: MutableStateFlow<TaskListState> =
+        MutableStateFlow(TaskListState(Date()))
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val liveData: LiveData<List<Task>> = selectedDate.flatMapLatest { value ->
-        repository.getTaskFlowFromDate(value)
+    val liveTaskList: LiveData<List<Task>> = selectedDate.flatMapLatest { value ->
+        repository.getTaskFlowFromDate(value.date)
     }.asLiveData(ioDispatcher)
 
 
@@ -52,7 +63,7 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
             minimalDate = repository.getMinDateOfTask()
         }
         selectedDate.asLiveData().observeForever {
-            if (it.after(getStartDateMillis(Date()))) {
+            if (it.date.after(getStartDateMillis(Date()))) {
                 nextDayButtonAlpha.postValue(DISABLED_TRANSPARENT)
                 nextDayButtonEnabled.postValue(false)
             } else {
@@ -60,7 +71,7 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
                 nextDayButtonEnabled.postValue(true)
             }
 
-            if (it.before(getEndDateMillis(minimalDate))) {
+            if (it.date.before(getEndDateMillis(minimalDate))) {
                 previousDayButtonAlpha.postValue(DISABLED_TRANSPARENT)
                 previousDayButtonEnabled.postValue(false)
             } else {
@@ -73,47 +84,54 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
     fun addTask(task: Task) {
         coroutineScope.launch {
             repository.insertTask(task)
+            requireRefreshList()
         }
     }
 
     fun updateTask(task: Task) {
         coroutineScope.launch {
             repository.updateTask(task)
+            requireRefreshList()
         }
     }
 
     fun changeDate(newDate: Date) {
         currentDateString.postValue(simpleDateFormat.format(newDate))
-        selectedDate.value = newDate
+        selectedDate.value = TaskListState(newDate)
     }
 
     fun setNextDay() {
-        if (selectedDate.value.before(getStartDateMillis(Date()))) {
+        if (selectedDate.value.date.before(getStartDateMillis(Date()))) {
             changeDate(Calendar.getInstance().apply {
-                time = selectedDate.value
+                time = selectedDate.value.date
                 add(Calendar.DAY_OF_MONTH, 1)
             }.time)
         }
     }
 
     fun setPreviousDay() {
-        if (selectedDate.value.after(getEndDateMillis(minimalDate))) {
+        if (selectedDate.value.date.after(getEndDateMillis(minimalDate))) {
             changeDate(Calendar.getInstance().apply {
-                time = selectedDate.value
+                time = selectedDate.value.date
                 add(Calendar.DAY_OF_MONTH, -1)
             }.time)
         }
     }
 
     fun getSelectedYear(): Int {
-        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.YEAR)
+        return Calendar.getInstance().apply { time = selectedDate.value.date }.get(Calendar.YEAR)
     }
 
     fun getSelectedMonth(): Int {
-        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.MONTH)
+        return Calendar.getInstance().apply { time = selectedDate.value.date }.get(Calendar.MONTH)
     }
 
     fun getSelectedDayOfMonth(): Int {
-        return Calendar.getInstance().apply { time = selectedDate.value }.get(Calendar.DAY_OF_MONTH)
+        return Calendar.getInstance().apply { time = selectedDate.value.date }
+            .get(Calendar.DAY_OF_MONTH)
+    }
+
+    private fun requireRefreshList() {
+        selectedDate.value = TaskListState(selectedDate.value.date)
     }
 }

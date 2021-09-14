@@ -50,7 +50,7 @@ class TaskRecyclerViewAdapter(
         holder.status.setOnCheckedChangeListener(null)
         holder.status.isChecked = item.isProductive
         holder.status.setOnCheckedChangeListener { _, isChecked ->
-            onTaskClickListener.onChangeProductivity(item.apply { isProductive = isChecked })
+            onTaskClickListener.onChangeProductivity(Task(item.timestamp, item.text, isChecked))
         }
         holder.divider.visibility = if (position == taskList.size - 1) {
             View.GONE
