@@ -1,11 +1,14 @@
 package com.example.whatdidyoudo.ui.main
 
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whatdidyoudo.R
 import com.example.whatdidyoudo.databases.Task
@@ -25,6 +28,7 @@ class TaskRecyclerViewAdapter(
     private val dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
     inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        val container: ConstraintLayout = binding.taskItemContainer
         val content: TextView = binding.content
         val timestamp: TextView = binding.timestamp
         val statusImage: ImageView = binding.statusImage
@@ -57,6 +61,11 @@ class TaskRecyclerViewAdapter(
         } else {
             View.VISIBLE
         }
+
+        holder.container.setOnLongClickListener {
+            showPopup(it)
+            true
+        }
     }
 
     override fun getItemCount(): Int = taskList.size
@@ -75,5 +84,21 @@ class TaskRecyclerViewAdapter(
 
     private fun chooseImageResource(isChecked: Boolean) =
         if (isChecked) R.drawable.hard_work_hat else R.drawable.coffee
+
+    private fun showPopup(v: View) {
+        val popup = PopupMenu(v.context, v)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.task_item_menu, popup.menu)
+        popup.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.remove_menu_option -> {
+//todo remove item
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
 
 }
