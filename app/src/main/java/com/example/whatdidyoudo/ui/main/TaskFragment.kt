@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputLayout
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
-class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
+class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnUserInteractWithTask {
 
     private val viewModel: TaskFragmentViewModel by viewModel()
 
@@ -109,5 +109,9 @@ class TaskFragment : Fragment(), TaskRecyclerViewAdapter.OnTaskClickListener {
 
     override fun onChangeProductivity(task: Task) {
         viewModel.updateTask(task)
+    }
+
+    override fun onChooseRemoveTask(task: Task) {
+        viewModel.removeTask(task)
     }
 }

@@ -13,16 +13,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.whatdidyoudo.R
 import com.example.whatdidyoudo.databases.Task
 import com.example.whatdidyoudo.databinding.FragmentItemBinding
+import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TaskRecyclerViewAdapter(
-    private val onTaskClickListener: OnTaskClickListener,
+    private val onUserInteractWithTask: OnUserInteractWithTask,
     private var taskList: List<Task>
 ) : RecyclerView.Adapter<TaskRecyclerViewAdapter.ViewHolder>() {
 
-    interface OnTaskClickListener {
+    interface OnUserInteractWithTask {
         fun onChangeProductivity(task: Task)
+        fun onChooseRemoveTask(task: Task)
     }
 
     private val dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -54,16 +56,27 @@ class TaskRecyclerViewAdapter(
         holder.status.setOnCheckedChangeListener(null)
         holder.status.isChecked = item.isProductive
         holder.status.setOnCheckedChangeListener { _, isChecked ->
-            onTaskClickListener.onChangeProductivity(Task(item.timestamp, item.text, isChecked))
+            onUserInteractWithTask.onChangeProductivity(Task(item.timestamp, item.text, isChecked))
         }
-        holder.divider.visibility = if (position == taskList.size - 1) {
+        holder.divider.visibility = if (position == taskList.lastIndex) {
             View.GONE
         } else {
             View.VISIBLE
         }
 
-        holder.container.setOnLongClickListener {
-            showPopup(it)
+        holder.container.setOnLongClickListener { container ->
+            val popup = createPopupMenu(container)
+            popup.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.remove_menu_option -> {
+                        onUserInteractWithTask.onChooseRemoveTask(item)
+                        showSnackbarWithConfirm(container, item.text)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
             true
         }
     }
@@ -85,20 +98,19 @@ class TaskRecyclerViewAdapter(
     private fun chooseImageResource(isChecked: Boolean) =
         if (isChecked) R.drawable.hard_work_hat else R.drawable.coffee
 
-    private fun showPopup(v: View) {
+    private fun createPopupMenu(v: View): PopupMenu {
         val popup = PopupMenu(v.context, v)
         val inflater: MenuInflater = popup.menuInflater
         inflater.inflate(R.menu.task_item_menu, popup.menu)
-        popup.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.remove_menu_option -> {
-//todo remove item
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
+        return popup
+    }
+
+    private fun showSnackbarWithConfirm(view: View, taskName: String) {
+        Snackbar.make(
+            view,
+            view.context.getString(R.string.task_removed_snackbar, taskName),
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
 }

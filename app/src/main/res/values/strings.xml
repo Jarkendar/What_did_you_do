@@ -14,4 +14,5 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="remove">Remove</string>
+    <string name="task_removed_snackbar">Task %1$s will be removed.</string>
 </resources>

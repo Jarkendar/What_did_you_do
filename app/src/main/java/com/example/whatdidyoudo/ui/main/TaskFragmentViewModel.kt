@@ -95,6 +95,13 @@ class TaskFragmentViewModel(ioDispatcher: CoroutineDispatcher, private val repos
         }
     }
 
+    fun removeTask(task: Task) {
+        coroutineScope.launch {
+            repository.removeTask(task)
+            requireRefreshList()
+        }
+    }
+
     fun changeDate(newDate: Date) {
         currentDateString.postValue(simpleDateFormat.format(newDate))
         selectedDate.value = TaskListState(newDate)
