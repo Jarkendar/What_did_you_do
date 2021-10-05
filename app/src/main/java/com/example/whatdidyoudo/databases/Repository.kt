@@ -29,6 +29,10 @@ class Repository(private val ioDispatcher: CoroutineDispatcher): KoinComponent {
         appDatabase.taskDao().updateTask(task)
     }
 
+    fun removeTask(task: Task) {
+        appDatabase.taskDao().deleteTask(task)
+    }
+
     fun getMinDateOfTask(): Date {
         return Date(appDatabase.taskDao().getMinimalDateOfTasks())
     }
